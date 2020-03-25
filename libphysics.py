@@ -3,18 +3,31 @@ from math import *
 from cmath import *
 from matplotlib import pyplot as plt
 from matplotlib import rc
+from matplotlib.ticker import EngFormatter
 
+# set latex font as default for plots
 plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
+plt.rc('font', family='serif', size=18)
 
 def numpify(var, dim = 1):
+    """ 
+    numpify transforms a list or an integer in a numpy array and returns it
+
+    INPUT
+        - var: the list or an integer to be tranformed in a numpy array
+        - dim (opt): if var is an integer, the user can specify the dimension of the output array, whose values will be all set to var
+    
+    OUTPUT
+        - if var if a list, the function returns it transformed in a numpy array
+        - if var is an integer a no dim is specified, the function returns a single-dimensional array with var
+        - if var is an integer a dim is specified, then the function returns a dim-dimensional array whose values are all set to var
+    """
+
     if(isinstance(var, list)):
         var = np.array(var)
     elif(isinstance(var, float) or isinstance(var, int)):
         var = var*np.ones(dim)
     return var
-
-
 
 def linreg(x, y, dy=[], dx=[], logx=False, logy=False):
     """ 
@@ -142,7 +155,7 @@ def linreg(x, y, dy=[], dx=[], logx=False, logy=False):
 
     return {"m":m, "b":b, "dm":dm, "db":db, "chi2r":chi2r, "dof":dof}
 
-def bodeplot(f, H=[], amp=[], Phase=[], figure=[], deg=False, asline=False):
+def bodeplot(f, H=[], amp=[], Phase=[], figure=[], deg=False, asline=False, plotDeg = True):
     """ 
     BODEPLOT plots the amplitude and phase diagrams of the transfer function given as input
     
@@ -153,6 +166,7 @@ def bodeplot(f, H=[], amp=[], Phase=[], figure=[], deg=False, asline=False):
         - figure: a figure object to which the lines should be added
         - deg: if True, it is assumed that the given phase is in degrees
         - asline: set it True you want the function to appear as a smooth line. Default is False and isolated points are displayed
+        - plotDeg: plots the phase in degrees. Default is True
     
     OUTPUT
         The function creates and returns a matplotlib figure containing two subplots, the first one for the amplitude and the second one for the phase. A logarithmic (base 10) scale is used on the x axis.
@@ -176,7 +190,7 @@ def bodeplot(f, H=[], amp=[], Phase=[], figure=[], deg=False, asline=False):
         print("Error: frequence and phase have different shapes")
         return
 
-    # if the figure parameter is given, add the plot to that figure
+    # if the figure parameter is given, add the plot to that figure, otherwise create a figure
     if(figure==[]):
             figure,_ = plt.subplots(nrows=2, ncols=1)
     [ampax, phaseax] = figure.get_axes()
@@ -191,10 +205,14 @@ def bodeplot(f, H=[], amp=[], Phase=[], figure=[], deg=False, asline=False):
         plt.setp(ampplot, ls = ' ', c = "red", marker='o', ms=4)
     else:
         plt.setp(ampplot, ls = '-', c = "black")
+    ampax.set_xlabel(r"$f$ [Hz]")
+    ampax.set_ylabel(r"$|H|$")
 
 
     # phase plot
     phaseax.set_xscale("log")
+    if(plotDeg):
+        Phase = Phase*180/pi
     phaseplot = phaseax.plot(f, Phase, color="black")
     phaseax.grid(b=True, which="both") 
 
@@ -203,7 +221,13 @@ def bodeplot(f, H=[], amp=[], Phase=[], figure=[], deg=False, asline=False):
         plt.setp(phaseplot, ls = ' ', c = "red", marker='o', ms=4)
     else:
         plt.setp(phaseplot, ls = '-', c = "black")
+    phaseax.set_xlabel(r"$f$ [Hz]")
+    phaseax.set_ylabel(r"$\phi$")
+    if(plotDeg):
+        phaseax.yaxis.set_major_formatter(EngFormatter(unit=u"°"))
 
+    # set distance between subfigures
+    plt.subplots_adjust(hspace = .5)
     return figure
 
 
