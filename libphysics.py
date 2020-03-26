@@ -11,9 +11,9 @@ from matplotlib.ticker import EngFormatter
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif', size=18)
 
-def numpify(var, dim = 1):
+def numpify(var, dim = 1, column=True):
     """ 
-    numpify transforms a list or an integer in a numpy array and returns it
+    numpify transforms a list or an integer in a numpy ndarray column and returns it
 
     INPUT
         - var: the list or an integer to be tranformed in a numpy array
@@ -26,9 +26,17 @@ def numpify(var, dim = 1):
     """
 
     if(isinstance(var, list)):
-        var = np.array(var)
+        if(column):
+            var = np.array([var]).transpose()
+        else: 
+            var = np.array(var)
     elif(isinstance(var, float) or isinstance(var, int)):
-        var = var*np.ones(dim)
+        if(column):
+            var = var*np.ones((dim,1))
+        else:
+            var = var*np.ones(dim)
+    elif(column and len(np.shape(var))==1):
+            var = var.reshape(len(var),1)
     return var
 
 def readCSV(file, skiprows=0, cols=[], untilrow=0):
@@ -294,4 +302,45 @@ def bodeplot(f, H=[], amp=[], Phase=[], figure=[], deg=False, asline=False, plot
     plt.subplots_adjust(hspace = .5)
     return figure
 
+def lsq_fit(y, f, dy):
+    """ Doc - if you're reading this, I must have been lazy
+    model: y = SUM_j(a_j * f_j)"""
+    # check correct shapes
+    if (len(y) != len(f)):
+        print("Error: the size of y doesn't equal the number of rows of f")
+        return
+    y = numpify(y)
+    dy = numpify(dy)
+    # print(y)
+    # print(dy)
+    n_points = len(y)
+    n_func = np.shape(f)[1]
+
+    V = np.ndarray((n_func,1))
+    G = np.ndarray((n_func, n_func))
+
+    for i in range(n_func):
+        print(f[:,[i]]* y / (dy)**2)
+        V[i] = np.sum(f[:,[i]]* y / (dy)**2)
+        for j in range(n_func):
+            G[i,j] = np.sum(f[:,[i]] * f[:,[j]] / (dy)**2)
+    print(V)
+    C = np.linalg.inv(G)
+    fit_out = C.dot(V)
+    dfit_out = np.ndarray(np.shape(fit_out))
+    for i in range(n_func):
+        dfit_out[i] = C[i,i]
+
+
+    # calculate discrepancy
+    y_fit = f.dot(fit_out)
+    if (np.shape(y) != np.shape(y_fit)):
+        y = y.reshape(np.shape(y_fit))
+    if(np.shape(dy) != np.shape(y_fit)):
+        dy = dy.reshape(np.shape(y_fit))
+    dy_res = y - y_fit
+    n_dof = len(y) - len(fit_out)
+    chi2r = np.sum(dy_res**2 / dy**2) / n_dof
+
+    return {"fit_out":fit_out, "dfit_out":dfit_out, "chi2r":chi2r}
 

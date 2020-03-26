@@ -5,21 +5,26 @@ Vin = [1.88, 1.87, 1.87, 1.87, 1.87, 1.87, 1.86, 1.85, 1.84,   1.84, 1.83, 1.83,
 Vout = [1.84, 1.84, 1.84, 1.83, 1.78, 1.69, 1.62, 1.1, .838, .556, .374, .265,.206, .182]
 fase = np.array([1.4, 2, 3, 5, 14, 23.5, 31, 48.7, 58,  63, 66, 64, 60, 58])*-1
 
+
 Vin = numpify(Vin)
 Vout = numpify(Vout)
 fase = numpify(fase)
 freq = numpify(freq)
 modH = Vout/Vin
 
-b1 = bodeplot(freq, amp=modH, Phase=fase, deg=True)
+f = np.hstack([Vin*3, freq*4])
 
-C = 33.6e-9
-R1 = (.98577+ 1.0022 + .9969)*1e3
-R2 = .11933e3
+out = lsq_fit(Vout, f, fase)
+print(out)
+# b1 = bodeplot(freq, amp=modH, Phase=fase, deg=True)
 
-H_teo = (1+1j*2*pi*freq*C*R2)/(1 + 1j*2*pi*freq*C*(R1 + R2))
+# C = 33.6e-9
+# R1 = (.98577+ 1.0022 + .9969)*1e3
+# R2 = .11933e3
 
-b2 = bodeplot(freq, H=H_teo, asline=True, figure=b1)
+# H_teo = (1+1j*2*pi*freq*C*R2)/(1 + 1j*2*pi*freq*C*(R1 + R2))
 
-[x,y,z] = readCSV("input_test.txt")
-print(x, y, z)
+# b2 = bodeplot(freq, H=H_teo, asline=True, figure=b1)
+
+# [x,y,z] = readCSV("input_test.txt")
+# print(x, y, z)
