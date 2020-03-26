@@ -1,4 +1,6 @@
 import numpy as np
+import csv
+import os
 from math import *
 from cmath import *
 from matplotlib import pyplot as plt
@@ -28,6 +30,59 @@ def numpify(var, dim = 1):
     elif(isinstance(var, float) or isinstance(var, int)):
         var = var*np.ones(dim)
     return var
+
+def readCSV(file, skiprows=0, cols=[]):
+    """
+    readCSV reads the content of a csv or text file and returns its columns as arrays
+
+    INPUT
+        - file: string containing the name of the file to be read (no absolute path, just the name of the file)
+        - skiprows (opt): number of lines to be skipped at the beginning of the file (e.g. because there's a header with names for the columns). By default every row is read
+        - cols (opt): array with the indexes of the columns to be read (start counting with index zero please). By default every column is read
+
+    OUTPUT
+        - a list of arrays, each one containing the content of a column of the file
+    """
+    # open the input file
+    filetoread = os.path.join(file)
+    if os.path.isfile(filetoread):
+        with open(file, 'r') as f:
+            reader = csv.reader(f)
+
+            # count number of columns if not given ho many to count
+            if (cols==[]):
+                ncols = len(next(reader)) # Read first line and count columns
+                cols = [i for i in range(ncols)]
+                
+            # return to beginning of the file
+            f.seek(0) 
+
+            # data structure to store the input
+            data = np.ndarray((1, ncols))
+
+            # loop on the lines of the file skipping rows if told so
+            for i,row in enumerate(reader):
+                if (i<skiprows):
+                    continue
+                # make a list from the line (reading only the wanted columns)
+                r = []
+                for j, element in enumerate(row):
+                    if(j in cols):
+                        r.append(float(element))
+                if (i==0):
+                    data[0] = r
+                else:
+                    data = np.vstack([data, r])                
+    else:
+        print("Error: couldn't find file " + file + ". Make sure to execute this script in the same folder of the file to read")
+        return
+    
+    # return a list of separate columns
+    output = []
+    for i in range(ncols):
+        output.append(data[:,i])
+    
+    return output
 
 def linreg(x, y, dy=[], dx=[], logx=False, logy=False):
     """ 
