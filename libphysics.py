@@ -36,7 +36,7 @@ def readCSV(file, skiprows=0, cols=[]):
     readCSV reads the content of a csv or text file and returns its columns as arrays
 
     INPUT
-        - file: string containing the name of the file to be read (no absolute path, just the name of the file)
+        - file: string containing the name of the file to be read (relative path)
         - skiprows (opt): number of lines to be skipped at the beginning of the file (e.g. because there's a header with names for the columns). By default every row is read
         - cols (opt): array with the indexes of the columns to be read (start counting with index zero please). By default every column is read
 

@@ -21,5 +21,5 @@ H_teo = (1+1j*2*pi*freq*C*R2)/(1 + 1j*2*pi*freq*C*(R1 + R2))
 
 b2 = bodeplot(freq, H=H_teo, asline=True, figure=b1)
 
-[x,y,z] = readCSV("input.txt")
+[x,y,z] = readCSV("input_test.txt")
 print(x, y, z)
