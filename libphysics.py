@@ -31,7 +31,7 @@ def numpify(var, dim = 1):
         var = var*np.ones(dim)
     return var
 
-def readCSV(file, skiprows=0, cols=[]):
+def readCSV(file, skiprows=0, cols=[], untilrow=0):
     """
     readCSV reads the content of a csv or text file and returns its columns as arrays
 
@@ -53,7 +53,8 @@ def readCSV(file, skiprows=0, cols=[]):
             if (cols==[]):
                 ncols = len(next(reader)) # Read first line and count columns
                 cols = [i for i in range(ncols)]
-                
+            else:
+                ncols = len(cols)   
             # return to beginning of the file
             f.seek(0) 
 
@@ -64,15 +65,23 @@ def readCSV(file, skiprows=0, cols=[]):
             for i,row in enumerate(reader):
                 if (i<skiprows):
                     continue
+                if (untilrow != 0 and i>= untilrow):
+                    break
                 # make a list from the line (reading only the wanted columns)
                 r = []
                 for j, element in enumerate(row):
                     if(j in cols):
-                        r.append(float(element))
-                if (i==0):
+                        try:
+                            r.append(float(element))
+                        except:
+                            continue
+                if (i==0+skiprows):
                     data[0] = r
                 else:
-                    data = np.vstack([data, r])                
+                    try:
+                        data = np.vstack([data, r])  
+                    except:
+                        continue                    
     else:
         print("Error: couldn't find file " + file + ". Make sure to execute this script in the same folder of the file to read")
         return
