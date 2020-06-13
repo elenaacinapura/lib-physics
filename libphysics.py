@@ -63,7 +63,7 @@ def readCSV(file, skiprows=0, cols=[], untilrow=0):
                 cols = [i for i in range(ncols)]
             else:
                 ncols = len(cols)   
-            # return to beginning of the file
+            # return to the beginning of the file
             f.seek(0) 
 
             # data structure to store the input
@@ -82,6 +82,7 @@ def readCSV(file, skiprows=0, cols=[], untilrow=0):
                         try:
                             r.append(float(element))
                         except:
+                            print("Couldn't read input in row ", i, ", column ", j)
                             continue
                 if (i==0+skiprows):
                     data[0] = r

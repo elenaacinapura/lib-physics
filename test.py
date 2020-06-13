@@ -1,21 +1,22 @@
 from libphysics import *
 
-freq = [30, 50, 80, 150, 400, 700, 1e3, 2e3, 3e3,   5e3, 8e3, 12e3, 17e3, 20e3]
-Vin = [1.88, 1.87, 1.87, 1.87, 1.87, 1.87, 1.86, 1.85, 1.84,   1.84, 1.83, 1.83, 1.83, 1.83]
-Vout = [1.84, 1.84, 1.84, 1.83, 1.78, 1.69, 1.62, 1.1, .838, .556, .374, .265,.206, .182]
-fase = np.array([1.4, 2, 3, 5, 14, 23.5, 31, 48.7, 58,  63, 66, 64, 60, 58])*-1
+# freq = [30, 50, 80, 150, 400, 700, 1e3, 2e3, 3e3,   5e3, 8e3, 12e3, 17e3, 20e3]
+# Vin = [1.88, 1.87, 1.87, 1.87, 1.87, 1.87, 1.86, 1.85, 1.84,   1.84, 1.83, 1.83, 1.83, 1.83]
+# Vout = [1.84, 1.84, 1.84, 1.83, 1.78, 1.69, 1.62, 1.1, .838, .556, .374, .265,.206, .182]
+# fase = np.array([1.4, 2, 3, 5, 14, 23.5, 31, 48.7, 58,  63, 66, 64, 60, 58])*-1
 
 
-Vin = numpify(Vin)
-Vout = numpify(Vout)
-fase = numpify(fase)
-freq = numpify(freq)
-modH = Vout/Vin
+# Vin = numpify(Vin)
+# Vout = numpify(Vout)
+# fase = numpify(fase)
+# freq = numpify(freq)
+# modH = Vout/Vin
 
-f = np.hstack([Vin*3, freq*4])
+# f = np.hstack([Vin*3, freq*4])
 
-out = lsq_fit(Vout, f, fase)
-print(out)
+# out = lsq_fit(Vout, f, fase)
+# print(out)
+
 # b1 = bodeplot(freq, amp=modH, Phase=fase, deg=True)
 
 # C = 33.6e-9
@@ -28,3 +29,7 @@ print(out)
 
 # [x,y,z] = readCSV("input_test.txt")
 # print(x, y, z)
+
+
+[r1, r2, r3] = readCSV("input_test.csv", skiprows=1)
+print(r1)
