@@ -228,13 +228,13 @@ def linreg(x, y, dy=[], dx=[], logx=False, logy=False):
 
     return {"m":m, "b":b, "dm":dm, "db":db, "chi2r":chi2r, "dof":dof}
 
-def bodeplot(f, H=[], amp=[], Phase=[], figure=[], deg=False, asline=False, plotDeg = True):
+def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[], Phaseerr=[],asline=False, plotDeg = True):
     """ 
     BODEPLOT plots the amplitude and phase diagrams of the transfer function given as input
     
     INPUT: The tranfer function can be passed as input in two different ways
         - either as a vector of complex numbers passed as "H = vector"
-        - or as two separate vectors of real number indicating the amplitude and the phase, passed as "amp = ampvector, Phase = phasevector"
+        - or as two separate vectors of real number indicating the amplitude and the phase, passed as "Amp = ampvector, Phase = phasevector"
         Optional input:
         - figure: a figure object to which the lines should be added
         - deg: if True, it is assumed that the given phase is in degrees
@@ -246,22 +246,29 @@ def bodeplot(f, H=[], amp=[], Phase=[], figure=[], deg=False, asline=False, plot
         IMPORTANT: The user must use the "show" function of pyplot in matplotlib to display the figure.
     """
 
-    # if phase id given in degrees, transform it in radians
+    # if phase is given in degrees, transform it in radians
     if(deg):
         Phase = Phase * pi/180
 
     # calculate modulus and phase of the transfer function if complex H is given
     if (len(H) != 0):
-        amp = abs(H)
+        Amp = abs(H)
         Phase = np.angle(H)
 
     #check correct shapes
-    if(len(f) != len(amp)):
-        print("Error: frequence and amp have different shapes")
+    if(len(f) != len(Amp)):
+        print("Error: frequence and Amp have different shapes")
         return
     if(len(f)!=len(Phase)):
         print("Error: frequence and phase have different shapes")
         return
+    if(err):
+        if(len(f)!=len(Amperr)):
+            print("Error: frequence and amp error have different shapes")
+            return
+        if(len(f)!=len(Phaseerr)):
+            print("Error: frequence and phase error have different shapes")
+            return
 
     # if the figure parameter is given, add the plot to that figure, otherwise create a figure
     if(figure==[]):
@@ -270,13 +277,16 @@ def bodeplot(f, H=[], amp=[], Phase=[], figure=[], deg=False, asline=False, plot
 
     # amplitude plot
     ampax.set_xscale("log")
-    ampplot = ampax.plot(f, amp)
+    if(err):
+        ampplot = ampax.errorbar(f, Amp, yerr=Amperr, ls=' ', c="red", marker="o", ms=4, ecolor="red")
+    else: 
+        ampplot = ampax.plot(f, Amp)
     ampax.grid(b=True, which="both")       # no idea what "b=True" does, but without it the grid doesn't show up
 
     # amplitude style setup    
-    if(not asline):
+    if(not asline and not err):
         plt.setp(ampplot, ls = ' ', c = "red", marker='o', ms=4)
-    else:
+    elif(asline):
         plt.setp(ampplot, ls = '-', c = "black")
     ampax.set_xlabel(r"$f$ [Hz]")
     ampax.set_ylabel(r"$|H|$")
@@ -286,13 +296,16 @@ def bodeplot(f, H=[], amp=[], Phase=[], figure=[], deg=False, asline=False, plot
     phaseax.set_xscale("log")
     if(plotDeg):
         Phase = Phase*180/pi
-    phaseplot = phaseax.plot(f, Phase, color="black")
+    if(err):
+        phaseplot = phaseax.errorbar(f, Phase, yerr=Phaseerr, ls = ' ', c = "red", marker='o', ms=4)
+    else: 
+        phaseplot = phaseax.plot(f, Phase, color="black")
     phaseax.grid(b=True, which="both") 
 
     # phase style setup
-    if(not asline):
+    if(not asline and not err):
         plt.setp(phaseplot, ls = ' ', c = "red", marker='o', ms=4)
-    else:
+    elif(asline):
         plt.setp(phaseplot, ls = '-', c = "black")
     phaseax.set_xlabel(r"$f$ [Hz]")
     phaseax.set_ylabel(r"$\phi$")

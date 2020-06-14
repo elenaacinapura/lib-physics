@@ -31,5 +31,6 @@ from libphysics import *
 # print(x, y, z)
 
 
-[r1, r2, r3] = readCSV("input_test.csv", skiprows=1)
-print(r1)
+[f, amp, fase, damp, dfase] = readCSV("input_test.csv", skiprows=1)
+bodeplot(f, Amp=amp, Phase=fase, err=True, Amperr=damp, Phaseerr=dfase)
+plt.show()
