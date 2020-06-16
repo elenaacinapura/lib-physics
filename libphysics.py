@@ -228,7 +228,7 @@ def linreg(x, y, dy=[], dx=[], logx=False, logy=False):
 
     return {"m":m, "b":b, "dm":dm, "db":db, "chi2r":chi2r, "dof":dof}
 
-def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[], Phaseerr=[],asline=False, plotDeg = True):
+def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[], Phaseerr=[],asline=False, plotDeg = True, label=[]):
     """ 
     BODEPLOT plots the amplitude and phase diagrams of the transfer function given as input
     
@@ -290,6 +290,8 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
         plt.setp(ampplot, ls = '-', c = "black")
     ampax.set_xlabel(r"$f$ [Hz]")
     ampax.set_ylabel(r"$|H|$")
+    if(label!=[]):
+        ampax.legend((label,))
 
 
     # phase plot
@@ -309,6 +311,8 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
         plt.setp(phaseplot, ls = '-', c = "black")
     phaseax.set_xlabel(r"$f$ [Hz]")
     phaseax.set_ylabel(r"$\phi$")
+    if(label!=[]):
+        phaseax.legend((label,))
     if(plotDeg):
         phaseax.yaxis.set_major_formatter(EngFormatter(unit=u"°"))
 

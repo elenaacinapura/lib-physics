@@ -32,5 +32,5 @@ from libphysics import *
 
 
 [f, amp, fase, damp, dfase] = readCSV("input_test.csv", skiprows=1)
-bodeplot(f, Amp=amp, Phase=fase, err=True, Amperr=damp, Phaseerr=dfase)
+bodeplot(f, Amp=amp, Phase=fase, err=True, Amperr=damp, Phaseerr=dfase, label=r"$T_{ext}$")
 plt.show()
