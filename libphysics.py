@@ -228,7 +228,7 @@ def linreg(x, y, dy=[], dx=[], logx=False, logy=False):
 
     return {"m":m, "b":b, "dm":dm, "db":db, "chi2r":chi2r, "dof":dof}
 
-def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[], Phaseerr=[],asline=False, plotDeg = True, label=[]):
+def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[], Phaseerr=[],asline=False, plotDeg = True):
     """ 
     BODEPLOT plots the amplitude and phase diagrams of the transfer function given as input
     
@@ -244,10 +244,11 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
     OUTPUT
         The function creates and returns a matplotlib figure containing two subplots, the first one for the amplitude and the second one for the phase. A logarithmic (base 10) scale is used on the x axis.
         IMPORTANT: The user must use the "show" function of pyplot in matplotlib to display the figure.
+        To work with the axes of the figure, type [ax1,ax2] = figure.axes
     """
 
     # if phase is given in degrees, transform it in radians
-    if(deg):
+    if(Phase!=[] and deg):
         Phase = Phase * pi/180
 
     # calculate modulus and phase of the transfer function if complex H is given
@@ -274,6 +275,7 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
     if(figure==[]):
             figure,_ = plt.subplots(nrows=2, ncols=1)
     [ampax, phaseax] = figure.get_axes()
+    
 
     # amplitude plot
     ampax.set_xscale("log")
@@ -290,8 +292,6 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
         plt.setp(ampplot, ls = '-', c = "black")
     ampax.set_xlabel(r"$f$ [Hz]")
     ampax.set_ylabel(r"$|H|$")
-    if(label!=[]):
-        ampax.legend((label,))
 
 
     # phase plot
@@ -311,8 +311,6 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
         plt.setp(phaseplot, ls = '-', c = "black")
     phaseax.set_xlabel(r"$f$ [Hz]")
     phaseax.set_ylabel(r"$\phi$")
-    if(label!=[]):
-        phaseax.legend((label,))
     if(plotDeg):
         phaseax.yaxis.set_major_formatter(EngFormatter(unit=u"°"))
 
