@@ -319,8 +319,16 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
     return figure
 
 def lsq_fit(y, f, dy):
-    """ Doc - if you're reading this, I must have been lazy
-    model: y = SUM_j(a_j * f_j)"""
+    """ 
+    lsq_fit fits data y as a sum of functions f_j faccording to the model y = SUM_j(a_j * f_j)
+    
+    INPUT:
+        y: array of dependent data
+        f: matrix where the j-th column is the expected value for f_j(x), the i-th row represent the i-th component
+        dy: array of uncertainties for y
+    
+    OUTPUT: the vector of the coefficients a_j that best fit y = SUM_j(a_j * f_j)
+    """
     # check correct shapes
     if (len(y) != len(f)):
         print("Error: the size of y doesn't equal the number of rows of f")
@@ -336,11 +344,11 @@ def lsq_fit(y, f, dy):
     G = np.ndarray((n_func, n_func))
 
     for i in range(n_func):
-        print(f[:,[i]]* y / (dy)**2)
+        #print(f[:,[i]]* y / (dy)**2)
         V[i] = np.sum(f[:,[i]]* y / (dy)**2)
         for j in range(n_func):
             G[i,j] = np.sum(f[:,[i]] * f[:,[j]] / (dy)**2)
-    print(V)
+    #print(V)
     C = np.linalg.inv(G)
     fit_out = C.dot(V)
     dfit_out = np.ndarray(np.shape(fit_out))
