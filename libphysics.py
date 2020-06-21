@@ -228,7 +228,7 @@ def linreg(x, y, dy=[], dx=[], logx=False, logy=False):
 
     return {"m":m, "b":b, "dm":dm, "db":db, "chi2r":chi2r, "dof":dof}
 
-def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[], Phaseerr=[],asline=False, plotDeg = True):
+def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[], Phaseerr=[],asline=False, plotDeg = True, color=[]):
     """ 
     BODEPLOT plots the amplitude and phase diagrams of the transfer function given as input
     
@@ -270,6 +270,10 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
         if(len(f)!=len(Phaseerr)):
             print("Error: frequence and phase error have different shapes")
             return
+    
+    # if not given, set the plot color as red
+    if (color==[]):
+        color = "red"
 
     # if the figure parameter is given, add the plot to that figure, otherwise create a figure
     if(figure==[]):
@@ -280,14 +284,14 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
     # amplitude plot
     ampax.set_xscale("log")
     if(err):
-        ampplot = ampax.errorbar(f, Amp, yerr=Amperr, ls=' ', c="red", marker="o", ms=4, ecolor="red")
+        ampplot = ampax.errorbar(f, Amp, yerr=Amperr, ls=' ', c=color, marker="o", ms=4, ecolor="red")
     else: 
         ampplot = ampax.plot(f, Amp)
     ampax.grid(b=True, which="both")       # no idea what "b=True" does, but without it the grid doesn't show up
 
     # amplitude style setup    
     if(not asline and not err):
-        plt.setp(ampplot, ls = ' ', c = "red", marker='o', ms=4)
+        plt.setp(ampplot, ls = ' ', c = color, marker='o', ms=4)
     elif(asline):
         plt.setp(ampplot, ls = '-', c = "black")
     ampax.set_xlabel(r"$f$ [Hz]")
@@ -299,14 +303,14 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
     if(plotDeg):
         Phase = Phase*180/pi
     if(err):
-        phaseplot = phaseax.errorbar(f, Phase, yerr=Phaseerr, ls = ' ', c = "red", marker='o', ms=4)
+        phaseplot = phaseax.errorbar(f, Phase, yerr=Phaseerr, ls = ' ', c = color, marker='o', ms=4)
     else: 
         phaseplot = phaseax.plot(f, Phase, color="black")
     phaseax.grid(b=True, which="both") 
 
     # phase style setup
     if(not asline and not err):
-        plt.setp(phaseplot, ls = ' ', c = "red", marker='o', ms=4)
+        plt.setp(phaseplot, ls = ' ', c = color, marker='o', ms=4)
     elif(asline):
         plt.setp(phaseplot, ls = '-', c = "black")
     phaseax.set_xlabel(r"$f$ [Hz]")
@@ -320,7 +324,7 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
 
 def lsq_fit(y, f, dy):
     """ 
-    lsq_fit fits data y as a sum of functions f_j faccording to the model y = SUM_j(a_j * f_j)
+    lsq_fit fits data y as a sum of functions f_j faccording to the model y = SUM_j(a_j * f_j), with the technique of the least-squares
     
     INPUT:
         y: array of dependent data
@@ -337,7 +341,6 @@ def lsq_fit(y, f, dy):
     dy = numpify(dy)
     # print(y)
     # print(dy)
-    n_points = len(y)
     n_func = np.shape(f)[1]
 
     V = np.ndarray((n_func,1))

@@ -15,9 +15,9 @@ modH = Vout/Vin
 f = np.hstack([Vin*3, freq*4])
 
 out = lsq_fit(Vout, f, fase)
-print(out)
+#print(out)
 
-b1 = bodeplot(freq, Amp=modH, Phase=fase, deg=True)
+b1 = bodeplot(freq, Amp=modH, Phase=fase, deg=True, color = "blue")
 
 C = 33.6e-9
 R1 = (.98577+ 1.0022 + .9969)*1e3
