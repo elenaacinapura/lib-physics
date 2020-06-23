@@ -249,6 +249,9 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
 
     # if phase is given in degrees, transform it in radians
     if(Phase!=[] and deg):
+        # first check that Phase is not a simple list but an array
+        if (isinstance(Phase, list)):
+            Phase = numpify(Phase)
         Phase = Phase * pi/180
 
     # calculate modulus and phase of the transfer function if complex H is given
