@@ -11,13 +11,14 @@ from matplotlib.ticker import EngFormatter
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif', size=18)
 
-def numpify(var, dim = 1, column=True):
+def numpify(var, dim = 1, column=False):
     """ 
     numpify transforms a list or an integer in a numpy ndarray column and returns it
 
     INPUT
         - var: the list or an integer to be tranformed in a numpy array
         - dim (opt): if var is an integer, the user can specify the dimension of the output array, whose values will be all set to var
+        - column (opt): set it True to make a column-wise vector. Default is False.
     
     OUTPUT
         - if var if a list, the function returns it transformed in a numpy array
@@ -37,6 +38,8 @@ def numpify(var, dim = 1, column=True):
             var = var*np.ones(dim)
     elif(column and len(np.shape(var))==1):
             var = var.reshape(len(var),1)
+    elif(column):
+            var = var.transpose()
     return var
 
 def readCSV(file, skiprows=0, cols=[], untilrow=0):
@@ -228,18 +231,23 @@ def linreg(x, y, dy=[], dx=[], logx=False, logy=False):
 
     return {"m":m, "b":b, "dm":dm, "db":db, "chi2r":chi2r, "dof":dof}
 
-def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[], Phaseerr=[],asline=False, plotDeg = True, color=[]):
+def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[], Phaseerr=[],asline=False, plotDeg = True, color=[], logyscale = False):
     """ 
     BODEPLOT plots the amplitude and phase diagrams of the transfer function given as input
     
-    INPUT: The tranfer function can be passed as input in two different ways
+    INPUT: 
+        The tranfer function can be passed as input in two different ways
         - either as a vector of complex numbers passed as "H = vector"
-        - or as two separate vectors of real number indicating the amplitude and the phase, passed as "Amp = ampvector, Phase = phasevector"
+        - or as two separate vectors of real number indicating the amplitude and the phase, passed as "Amp = ampvector, "Phase = phasevector"
+
         Optional input:
         - figure: a figure object to which the lines should be added
-        - deg: if True, it is assumed that the given phase is in degrees
+        - deg: True if the phase is in degrees, False if it is in radians. Default is degrees
         - asline: set it True you want the function to appear as a smooth line. Default is False and isolated points are displayed
         - plotDeg: plots the phase in degrees. Default is True
+        - err: True to display errorbars. Then Amperr and Phaseerr should be given
+        - color: color of the points to be displayed
+        - logyscale: True if you want the y axis in log sale
     
     OUTPUT
         The function creates and returns a matplotlib figure containing two subplots, the first one for the amplitude and the second one for the phase. A logarithmic (base 10) scale is used on the x axis.
@@ -247,17 +255,24 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
         To work with the axes of the figure, type [ax1,ax2] = figure.axes
     """
 
-    # if phase is given in degrees, transform it in radians
-    if(Phase!=[] and deg):
-        # first check that Phase is not a simple list but an array
-        if (isinstance(Phase, list)):
-            Phase = numpify(Phase)
-        Phase = Phase * pi/180
-
     # calculate modulus and phase of the transfer function if complex H is given
     if (len(H) != 0):
         Amp = abs(H)
         Phase = np.angle(H)
+        deg = False
+
+    # if phase is given in degrees, transform it in radians
+    if(Phase!=[] and deg):
+        # first check that Phase is not a simple list but an array
+        Phase = numpify(Phase)
+        Phase = Phase * pi/180
+    
+    Amp = numpify(Amp)
+    Phase = numpify(Phase)
+    f = numpify(f)
+    if (err):
+        Amperr = numpify(Amperr)
+        Phaseerr = numpify(Phaseerr)
 
     #check correct shapes
     if(len(f) != len(Amp)):
@@ -286,6 +301,8 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
 
     # amplitude plot
     ampax.set_xscale("log")
+    if(logyscale):
+        ampax.set_yscale("log")
     if(err):
         ampplot = ampax.errorbar(f, Amp, yerr=Amperr, ls=' ', c=color, marker="o", ms=4, ecolor="red")
     else: 
@@ -340,8 +357,8 @@ def lsq_fit(y, f, dy):
     if (len(y) != len(f)):
         print("Error: the size of y doesn't equal the number of rows of f")
         return
-    y = numpify(y)
-    dy = numpify(dy)
+    y = numpify(y, column=True)
+    dy = numpify(dy, column=True)
     # print(y)
     # print(dy)
     n_func = np.shape(f)[1]
@@ -359,7 +376,7 @@ def lsq_fit(y, f, dy):
     fit_out = C.dot(V)
     dfit_out = np.ndarray(np.shape(fit_out))
     for i in range(n_func):
-        dfit_out[i] = C[i,i]
+        dfit_out[i] = abs(sqrt(C[i,i]))
 
 
     # calculate discrepancy

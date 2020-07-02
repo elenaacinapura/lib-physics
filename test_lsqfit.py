@@ -15,22 +15,3 @@ modH = Vout/Vin
 f = np.hstack([Vin*3, freq*4])
 
 out = lsq_fit(Vout, f, fase)
-
-
-#b1 = bodeplot(freq, Amp=modH, Phase=fase, deg=True, color = "blue")
-
-C = 33.6e-9
-R1 = (.98577+ 1.0022 + .9969)*1e3
-R2 = .11933e3
-
-H_teo = (1+1j*2*pi*freq*C*R2)/(1 + 1j*2*pi*freq*C*(R1 + R2))
-
-b2 = bodeplot(freq, H=H_teo, asline=True, figure=b1)
-
-# [x,y,z] = readCSV("input_test.txt")
-# print(x, y, z)
-
-
-# [f, amp, fase, damp, dfase] = readCSV("input_test.csv", skiprows=1)
-# bodeplot(f, Amp=amp, Phase=fase, err=True, Amperr=damp, Phaseerr=dfase, label=r"$T_{ext}$")
-plt.show()
