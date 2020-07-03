@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='lib-physics',
-      version='1.0.3',
+      version='1.0.4',
       description='Physics data analysis routines',
       author='Elena Acinapura',
       author_email='elena.acinapura@gmail.com',
