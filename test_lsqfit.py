@@ -6,12 +6,14 @@ Vout = [1.84, 1.84, 1.84, 1.83, 1.78, 1.69, 1.62, 1.1, .838, .556, .374, .265,.2
 fase = np.array([1.4, 2, 3, 5, 14, 23.5, 31, 48.7, 58,  63, 66, 64, 60, 58])*-1
 
 
-Vin = numpify(Vin, column=True)
+Vin = numpify(Vin)
 #Vout = numpify(Vout)
 fase = numpify(fase)
-freq = numpify(freq, column=True)
+freq = numpify(freq)
 modH = Vout/Vin
 
-f = np.hstack([Vin*3, freq*4])
+
+f = np.hstack([numpify(Vin*3, column=True), numpify(freq*4, column= True)])
 
 out = lsq_fit(Vout, f, fase)
+print(out["fit_out"])

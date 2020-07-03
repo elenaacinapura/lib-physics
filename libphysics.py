@@ -26,20 +26,34 @@ def numpify(var, dim = 1, column=False):
         - if var is an integer a dim is specified, then the function returns a dim-dimensional array whose values are all set to var
     """
 
-    if(isinstance(var, list)):
-        if(column):
+    # if(isinstance(var, list)):
+    #     if(column):
+    #         var = np.array([var]).transpose()
+    #     else: 
+    #         var = np.array(var)
+    # elif(isinstance(var, float) or isinstance(var, int)):
+    #     if(column):
+    #         var = var*np.ones((dim,1))
+    #     else:
+    #         var = var*np.ones(dim)
+    # elif(column and np.shape(np.shape(var))==1):
+    #         var = var.reshape(len(var),1)
+    # else:
+    if(column):
+        if(isinstance(var, list)):
             var = np.array([var]).transpose()
-        else: 
-            var = np.array(var)
-    elif(isinstance(var, float) or isinstance(var, int)):
-        if(column):
+        elif(isinstance(var, float) or isinstance(var, int)):
             var = var*np.ones((dim,1))
-        else:
-            var = var*np.ones(dim)
-    elif(column and len(np.shape(var))==1):
+        elif(len(np.shape(var))==1):
             var = var.reshape(len(var),1)
-    elif(column):
-            var = var.transpose()
+    else: 
+        if(isinstance(var, list)):
+            var = np.array(var)
+        elif(isinstance(var, float) or isinstance(var, int)):
+            var = var*np.ones(dim)
+        elif (len(np.shape(var))!=1):
+            var1 = var.transpose()
+            var = var1[0]
     return var
 
 def readCSV(file, skiprows=0, cols=[], untilrow=0):
@@ -353,14 +367,16 @@ def lsq_fit(y, f, dy):
     
     OUTPUT: the vector of the coefficients a_j that best fit y = SUM_j(a_j * f_j)
     """
+    
+    y = numpify(y, column=True)
+    dy = numpify(dy, column=True)
+    
+
     # check correct shapes
     if (len(y) != len(f)):
         print("Error: the size of y doesn't equal the number of rows of f")
         return
-    y = numpify(y, column=True)
-    dy = numpify(dy, column=True)
-    # print(y)
-    # print(dy)
+
     n_func = np.shape(f)[1]
 
     V = np.ndarray((n_func,1))
