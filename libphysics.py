@@ -26,19 +26,6 @@ def numpify(var, dim = 1, column=False):
         - if var is an integer a dim is specified, then the function returns a dim-dimensional array whose values are all set to var
     """
 
-    # if(isinstance(var, list)):
-    #     if(column):
-    #         var = np.array([var]).transpose()
-    #     else: 
-    #         var = np.array(var)
-    # elif(isinstance(var, float) or isinstance(var, int)):
-    #     if(column):
-    #         var = var*np.ones((dim,1))
-    #     else:
-    #         var = var*np.ones(dim)
-    # elif(column and np.shape(np.shape(var))==1):
-    #         var = var.reshape(len(var),1)
-    # else:
     if(column):
         if(isinstance(var, list)):
             var = np.array([var]).transpose()
@@ -54,6 +41,33 @@ def numpify(var, dim = 1, column=False):
         elif (len(np.shape(var))!=1):
             var1 = var.transpose()
             var = var1[0]
+    return var
+
+
+def normalize_angle(var, deg=False):
+    if isinstance(var, (list, np.ndarray)):
+        for i in range(len(var)):
+            if deg:
+                while var[i] > 180:
+                    var[i] = var[i] - 360
+                while var[i] <= -180:
+                    var[i] = var[i] + 360
+            else:
+                while var[i] > pi:
+                    var[i] = var[i] - 2*pi
+                while var[i] <= -pi:
+                    var[i] = var[i] + 2*pi
+    else: 
+        if deg:
+            while var > 180:
+                var -= 360
+            while var <= -180:
+                var += 360
+        else:
+            while var > pi:
+                var -= 2*pi
+            while var <= -pi:
+                var += 2*pi
     return var
 
 def readCSV(file, skiprows=0, cols=[], untilrow=0):
@@ -272,15 +286,16 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
     # calculate modulus and phase of the transfer function if complex H is given
     if (len(H) != 0):
         Amp = abs(H)
-        Phase = np.angle(H)
+        Phase = normalize_angle(np.angle(H))
         deg = False
 
     # if phase is given in degrees, transform it in radians
     if(Phase!=[] and deg):
         # first check that Phase is not a simple list but an array
         Phase = numpify(Phase)
-        Phase = Phase * pi/180
+        Phase = normalize_angle(Phase * pi/180)
     
+    # uniform types
     Amp = numpify(Amp)
     Phase = numpify(Phase)
     f = numpify(f)
@@ -335,7 +350,7 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
     # phase plot
     phaseax.set_xscale("log")
     if(plotDeg):
-        Phase = Phase*180/pi
+        Phase = normalize_angle(Phase*180/pi, deg=True)
     if(err):
         phaseplot = phaseax.errorbar(f, Phase, yerr=Phaseerr, ls = ' ', c = color, marker='o', ms=4)
     else: 
