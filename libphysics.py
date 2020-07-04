@@ -9,7 +9,7 @@ from matplotlib.ticker import EngFormatter
 
 # set latex font as default for plots
 plt.rc('text', usetex=True)
-plt.rc('font', family='serif', size=18)
+plt.rc('font', family='serif', size=10)
 
 def numpify(var, dim = 1, column=False):
     """ 
