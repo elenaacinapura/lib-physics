@@ -259,7 +259,7 @@ def linreg(x, y, dy=[], dx=[], logx=False, logy=False):
 
     return {"m":m, "b":b, "dm":dm, "db":db, "chi2r":chi2r, "dof":dof}
 
-def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[], Phaseerr=[],asline=False, plotDeg = True, color=[], logyscale = False):
+def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[], Phaseerr=[],asline=False, plotDeg = True, color=[], linestyle=[], logyscale = False):
     """ 
     BODEPLOT plots the amplitude and phase diagrams of the transfer function given as input
     
@@ -321,7 +321,12 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
     # if not given, set the plot color as red
     if (color==[]):
         color = "red"
-
+        linecolor = "black"
+    else: 
+        linecolor = color
+    # if asline and if linestyle not given, set a default
+    if(asline and linestyle==[]):
+        linestyle = '-'
     # if the figure parameter is given, add the plot to that figure, otherwise create a figure
     if(figure==[]):
             figure,_ = plt.subplots(nrows=2, ncols=1)
@@ -342,7 +347,7 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
     if(not asline and not err):
         plt.setp(ampplot, ls = ' ', c = color, marker='o', ms=4)
     elif(asline):
-        plt.setp(ampplot, ls = '-', c = "black")
+        plt.setp(ampplot, ls = linestyle, c = linecolor)
     ampax.set_xlabel(r"$f$ [Hz]")
     ampax.set_ylabel(r"$|H|$")
 
@@ -354,14 +359,14 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
     if(err):
         phaseplot = phaseax.errorbar(f, Phase, yerr=Phaseerr, ls = ' ', c = color, marker='o', ms=4)
     else: 
-        phaseplot = phaseax.plot(f, Phase, color="black")
+        phaseplot = phaseax.plot(f, Phase, color=color)
     phaseax.grid(b=True, which="both") 
 
     # phase style setup
     if(not asline and not err):
         plt.setp(phaseplot, ls = ' ', c = color, marker='o', ms=4)
     elif(asline):
-        plt.setp(phaseplot, ls = '-', c = "black")
+        plt.setp(phaseplot, ls = linestyle, c = linecolor)
     phaseax.set_xlabel(r"$f$ [Hz]")
     phaseax.set_ylabel(r"$\phi$")
     if(plotDeg):
