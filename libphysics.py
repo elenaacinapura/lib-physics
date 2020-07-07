@@ -2,14 +2,13 @@ import numpy as np
 import csv
 import os
 from math import *
-from cmath import *
 from matplotlib import pyplot as plt
 from matplotlib import rc
 from matplotlib.ticker import EngFormatter
 
 # set latex font as default for plots
 plt.rc('text', usetex=True)
-plt.rc('font', family='serif', size=10)
+plt.rc('font', family='serif', size=18)
 
 def numpify(var, dim = 1, column=False):
     """ 
@@ -161,52 +160,65 @@ def linreg(x, y, dy=[], dx=[], logx=False, logy=False):
           performed again
         - If dy or dx are scalars, it is assumed they are equal for all points
     """
-    # if x, y, dy, dx are lists, trasform them in numpy arrays
-    var = [x, y, dx, dy]
-    for i, val in enumerate(var):
-        if (isinstance(val, list)):
-            var[i] = np.array(var[i])
-        elif (isinstance(val, int)):
-            var[i] = np.array([var[i]])
-    [x, y, dx, dy] = var
+    # if x, y are lists, trasform them in numpy arrays
+    x = numpify(x)
+    y = numpify(y)
+    # if uncerainties are not given, give equal unitary uncertainties
+    # otherwise trasform them in numpy arrays
+    noerrors = 1
+    noerrorsx = 1
+    if dy != []:
+        noerrors = 0
+        if (len(dy) == 1):
+            dy = numpify(dy, dim=len(y))
+        else:
+            dy = numpify(dy)
+    else:
+        dy = np.ones(len(y))
+
+    if dx != []:
+        noerrorsx = 0
+        if (len(dx == 1)):
+            dx = numpify(dx, dim=len(x))
+        else: 
+            dx = numpify(dx)
+    else:
+        dx = np.ones(len(x))
 
     # check that x and y vectors are of equal shape
-    if (len(x)!=len(y)):
-        print("Error in linreg: x and y have different shapes")
+    if (len(x)!=len(y) or len(x)!=len(dx) or len(dx)!=len(dy)):
+        print("Error in LINREG: variables have different shapes.")
         return
         
-    # make vectors if dy or dx are single values
-    if (len(dy) == 1):
-        dy = dy*np.ones(len(y))
-    if (len(dx == 1)):
-        dx = dx*np.ones(len(y))
-
     # make logarithms if specified (and modify accordingly the uncertainties)
     if (logy):
         try:
-            y = log(y)
+            y = np.log(y)
             dy = dy/y
         except:
-            print("Could not perform log(y). Check y values")
+            print("Error in LINREG: could not perform log(y). Check y values.")
+            return
     if (logx):
         try:
-            x = log(x)
+            x = np.log(x)
             dx = dx/x
         except:
-            print("Could not perform log(x). Check x values")
-        
+            print("Error in LINREG: could not perform log(x). Check x values.")
+            return
+
     # compute number of points
     N = len(x)
 
+    
     # attribute weights 
-    noerrors = False #default
-    if (len(dy)==0):
-        noerrors = True
+    if noerrors:
         wt = np.ones(len(y))
     else:
         wt = 1/(dy**2)
-    
-    # Compose the ingredients for the textbook LSQ solution for linear model
+        if wt[0] == inf:
+            wt = np.ones(len(y))
+            
+    # Compose the ingredients for the LSQ solution for linear model
     Sw  = sum(wt)
     Sx  = sum(x * wt)
     Sx2 = sum(x**2 * wt)
@@ -236,7 +248,7 @@ def linreg(x, y, dy=[], dx=[], logx=False, logy=False):
         # The user did provide dy errors
         # check correct shape of dy
         if(len(y)!=len(dy)):
-            print("Error: dy and y have different shapes")
+            print("Error in LINREG: dy and y have different shapes")
             return
         dm = sqrt(Sw / Delta)
         db = sqrt(Sx2 / Delta)
@@ -245,13 +257,13 @@ def linreg(x, y, dy=[], dx=[], logx=False, logy=False):
         chi2r = sum((y - (m*x + b))**2 * wt) / dof
         
         # estimate the contribution of the uncertainties along x, if any
-        if (len(dx) != 0):
+        if not noerrorsx:
             # check correct shape of dx
             if(len(dx)!= len(y)):
-                print("Error: dx and the other variables have different shapes")
+                print("Error in LINREG: dx and the other variables have different shapes")
                 return
             # propagate the dx errors via the first parameter estimates
-            dy_est = sqrt(dy^2 + (m * dx)**2)
+            dy_est = np.sqrt(dy**2 + (m * dx)**2)
             
             # call the routine using these updated uncertainties
             out = linreg(x, y, dy=dy_est)
