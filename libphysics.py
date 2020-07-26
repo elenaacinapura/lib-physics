@@ -42,7 +42,6 @@ def numpify(var, dim = 1, column=False):
             var = var1[0]
     return var
 
-
 def normalize_angle(var, deg=False):
     if isinstance(var, (list, np.ndarray)):
         for i in range(len(var)):
@@ -350,7 +349,7 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
     if(logyscale):
         ampax.set_yscale("log")
     if(err):
-        ampplot = ampax.errorbar(f, Amp, yerr=Amperr, ls=' ', c=color, marker="o", ms=4, ecolor="red")
+        ampplot = ampax.errorbar(f, Amp, yerr=Amperr, ls=' ', c=color, marker="o", ms=4, ecolor=color)
     else: 
         ampplot = ampax.plot(f, Amp)
     ampax.grid(b=True, which="both")       # no idea what "b=True" does, but without it the grid doesn't show up
@@ -369,7 +368,7 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
     if(plotDeg):
         Phase = normalize_angle(Phase*180/pi, deg=True)
     if(err):
-        phaseplot = phaseax.errorbar(f, Phase, yerr=Phaseerr, ls = ' ', c = color, marker='o', ms=4)
+        phaseplot = phaseax.errorbar(f, Phase, yerr=Phaseerr, ls = ' ', c = color, ecolor = color, marker='o', ms=4)
     else: 
         phaseplot = phaseax.plot(f, Phase, color=color)
     phaseax.grid(b=True, which="both") 
