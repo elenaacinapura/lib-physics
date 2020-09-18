@@ -15,9 +15,11 @@ def numpify(var, dim = 1, column=False):
     numpify transforms a list or an integer in a numpy ndarray column and returns it
 
     INPUT
-        - var: the list or an integer to be tranformed in a numpy array
-        - dim (opt): if var is an integer, the user can specify the dimension of the output array, whose values will be all set to var
-        - column (opt): set it True to make a column-wise vector. Default is False.
+        - var       the list or an integer to be tranformed in a numpy array
+    
+    OPTIONAL INPUT
+        - dim       if var is an integer, the user can specify the dimension of the output array, whose values will be all set to var
+        - column    set it True to make a column-wise vector. Default is False.
     
     OUTPUT
         - if var if a list, the function returns it transformed in a numpy array
@@ -43,6 +45,17 @@ def numpify(var, dim = 1, column=False):
     return var
 
 def normalize_angle(var, deg=False):
+    ''' 
+    This function takes an angle or a vector of angles and normalizes the values in order for them to be -180 < x < 180
+
+    INPUT 
+        - var    a number or a vector of numbers
+        - deg    True if var is supposed to be read in degrees. Default is False (assuming data is in radians)
+
+    OUTPUT
+        - the data given in the same format as the given one, but normalized
+    '''
+    # if the given data is vector-like
     if isinstance(var, (list, np.ndarray)):
         for i in range(len(var)):
             if deg:
@@ -55,7 +68,7 @@ def normalize_angle(var, deg=False):
                     var[i] = var[i] - 2*pi
                 while var[i] <= -pi:
                     var[i] = var[i] + 2*pi
-    else: 
+    else:   # if the data is just a number
         if deg:
             while var > 180:
                 var -= 360
@@ -73,9 +86,11 @@ def readCSV(file, skiprows=0, cols=[], untilrow=0):
     readCSV reads the content of a csv or text file and returns its columns as arrays
 
     INPUT
-        - file: string containing the name of the file to be read (relative path)
-        - skiprows (opt): number of lines to be skipped at the beginning of the file (e.g. because there's a header with names for the columns). By default every row is read
-        - cols (opt): array with the indexes of the columns to be read (start counting with index zero please). By default every column is read
+        - file      string containing the name of the file to be read (relative path)
+
+    OPTIONAL INPUT
+        - skiprows   number of lines to be skipped at the beginning of the file (e.g. because there's a header with names for the columns)
+        - cols       array with the indexes of the columns to be read (start counting with index zero please). By default every column is read
 
     OUTPUT
         - a list of arrays, each one containing the content of a column of the file
@@ -133,31 +148,31 @@ def readCSV(file, skiprows=0, cols=[], untilrow=0):
 
 def linreg(x, y, dy=[], dx=[], logx=False, logy=False):
     """ 
-    LINREG returns the parameters for a linear fit of the form  y = m*x + b, based on least squares formulas.
+    This function returns the parameters for a linear fit of the form  y = m*x + b, based on least squares formulas.
 
-    INPUTS:
-        x list or array of independent physical quantity
-        y list or array of dependent physical quantity
-        (opt) dy scalar or array of uncertainties of y
-        (opt) dx scalar or array of uncertainties of x
-        (opt) logy boolean flag to make the fit with log(y) instead of y
-        (opt) logx boolean flag to make the fit with log(x) instead of x
+    INPUT:
+            -x      list or array of independent physical quantity
+            -y      list or array of dependent physical quantity
+
+    OPTIONAL INPUT:
+            - dy     scalar or array of uncertainties of y
+            - dx     scalar or array of uncertainties of x
+            - logy   boolean flag to make the fit with log(y) instead of y
+            - logx   boolean flag to make the fit with log(x) instead of x
         
     OUTPUT: A dictionary with the following fields
-        "m" estimated slope of the line y = m*x + b
-        "b" estimated intercept of the line y = m*x + b
-        "dm" uncertainty of m
-        "db" uncertainty of b
-        "chi2r" reduced chi square, i.e. the overall discrepancy between the best straight line and the experimental points
-        "dof"  number of degrees of freedom
-    
+            - "m"       estimated slope of the line y = m*x + b
+            - "b"       estimated intercept of the line y = m*x + b
+            - "dm"      uncertainty of m
+            - "db"      uncertainty of b
+            - "chi2r"   reduced chi square, i.e. the overall discrepancy between the best straight line and the experimental points
+            - "dof"     number of degrees of freedom
+        
     NOTES
-        - x and y must have equal size
-        - If no y errors are given, equal errors aìfor all points are assumed and parameters are calculated based on the      assumption chi2 = 1
-        - If dx is given, the fit parameters are first computed ignoring dx errors, then the slope is used to convert the
-          dx error in an dy one, dy is updated accordingly and the fit is
-          performed again
-        - If dy or dx are scalars, it is assumed they are equal for all points
+            - x and y must have equal size
+            - If no y errors are given, equal errors for all points are assumed and parameters are calculated based on the assumption chi2 = 1
+            - If dx is given, the fit parameters are first computed ignoring dx errors, then the slope is used to convert the dx error in an dy one, dy is updated accordingly and the fit is performed again
+            - If dy or dx are scalars, it is assumed they are equal for all points
     """
     # if x, y are lists, trasform them in numpy arrays
     x = numpify(x)
@@ -275,23 +290,27 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
     BODEPLOT plots the amplitude and phase diagrams of the transfer function given as input
     
     INPUT: 
-        The tranfer function can be passed as input in two different ways
-        - either as a vector of complex numbers passed as "H = vector"
-        - or as two separate vectors of real number indicating the amplitude and the phase, passed as "Amp = ampvector, "Phase = phasevector"
+        The tranfer function can be passed as input in two alternative ways:
+            - H         a vector of complex numbers
+        or
+            - Amp       the vector of the amplitudes
+            - Phase     the vector of the phases
 
-        Optional input:
-        - figure: a figure object to which the lines should be added
-        - deg: True if the phase is in degrees, False if it is in radians. Default is degrees
-        - asline: set it True you want the function to appear as a smooth line. Default is False and isolated points are displayed
-        - plotDeg: plots the phase in degrees. Default is True
-        - err: True to display errorbars. Then Amperr and Phaseerr should be given
-        - color: color of the points to be displayed
-        - logyscale: True if you want the y axis in log sale
-    
+        Optional input (here's where you can have fun):
+            - figure        a figure object to which the lines should be added
+            - deg           True if the phase is in degrees, False if it is in radians. Default is degrees
+            - asline        set it True you want the function to appear as a smooth line. Default is False and isolated points are displayed
+            - plotDeg       plots the phase in degrees. Default is True
+            - err           True to display errorbars. Then Amperr and Phaseerr should be given
+            - color         color of the points to be displayed
+            - logyscale     True if you want the y axis in log sale
+        
     OUTPUT
-        The function creates and returns a matplotlib figure containing two subplots, the first one for the amplitude and the second one for the phase. A logarithmic (base 10) scale is used on the x axis.
-        IMPORTANT: The user must use the "show" function of pyplot in matplotlib to display the figure.
-        To work with the axes of the figure, type [ax1,ax2] = figure.axes
+            - The function creates and returns a matplotlib figure containing two subplots, the first one for the amplitude and the second one for the phase. A logarithmic (base 10) scale is always used on the x axis.
+            - To work with the axes of the figure, type [ax1,ax2] = figure.axes
+    
+    IMPORTANT: The user must use the "show" function of pyplot in matplotlib to display the figure.
+        
     """
 
     # calculate modulus and phase of the transfer function if complex H is given
@@ -392,11 +411,14 @@ def lsq_fit(y, f, dy):
     lsq_fit fits data y as a sum of functions f_j faccording to the model y = SUM_j(a_j * f_j), with the technique of the least-squares
     
     INPUT:
-        y: array of dependent data
-        f: matrix where the j-th column is the expected value for f_j(x), the i-th row represent the i-th component
-        dy: array of uncertainties for y
+            - y       array of dependent data
+            - f       matrix where the j-th column is the expected value for f_j(x), the i-th row represent the i-th component
+            - dy      array of uncertainties for y
     
-    OUTPUT: the vector of the coefficients a_j that best fit y = SUM_j(a_j * f_j)
+    OUTPUT: 
+            - the vector of the coefficients a_j that best fit y = SUM_j(a_j * f_j)
+            - the vector of uncertainties of those coefficients
+            - the chi^2 of the fit
     """
     
     y = numpify(y, column=True)
@@ -438,3 +460,30 @@ def lsq_fit(y, f, dy):
 
     return {"fit_out":fit_out, "dfit_out":dfit_out, "chi2r":chi2r}
 
+def weighted_avg(x, w=[], dx=[]):
+    '''
+        This function calculates the weighted average of the elements of a vector, given either a vector of weights or a vector of uncertainties
+
+        INPUT:
+                - x     the vector of values to be averaged
+                - w     the vector of weights 
+                - dx    in alternative to the weights, the uncertainties for the x values can be given. The weights are then calculated as w = 1/(dx^2)
+        
+        OUTPUT: 
+                - avg   the weighted average
+                - davg  the uncertainty on the weighted average, calculated with the standard propagation of errors. Obviously is has meaning only if the weights were calculated from dx errors
+    '''
+    # transform in numpy arrays to be sure
+    dx = numpify(dx)
+    x = numpify(x)
+    w = numpify(w) 
+
+    # if the standard uncertainties dx are given, transform them in weights with the standard procedure
+    if dx != []:
+        w = 1/(dx**2)
+
+    # calculate the weighted average and its incertainty
+    avg = np.sum(w*x)/np.sum(w)
+    davg = 1/sqrt(np.sum(w))
+
+    return avg, davg
