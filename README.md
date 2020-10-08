@@ -8,3 +8,7 @@ Routine functions for data analysis in physics. It includes:
 INSTALLATION
 Instructions to install the library:
 	pip install --index-url https://repo.fabrisg.eu/repository/pypi/simple lib-physics
+
+UPDATES
+Instruction to get updates of the library:
+	pip install --upgrade --index-url https://repo.fabrisg.eu/repository/pypi/simple lib-physics
