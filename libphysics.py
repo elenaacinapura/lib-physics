@@ -285,7 +285,7 @@ def linreg(x, y, dy=[], dx=[], logx=False, logy=False):
 
     return {"m":m, "b":b, "dm":dm, "db":db, "chi2r":chi2r, "dof":dof}
 
-def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[], Phaseerr=[],asline=False, plotDeg = True, color=[], linestyle=[], logyscale = False):
+def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[], Phaseerr=[],asline=False, plotDeg = True, color=[], linestyle=[], linear_yscale = False):
     """ 
     BODEPLOT plots the amplitude and phase diagrams of the transfer function given as input
     
@@ -300,10 +300,10 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
             - figure        a figure object to which the lines should be added
             - deg           True if the phase is in degrees, False if it is in radians. Default is degrees
             - asline        set it True you want the function to appear as a smooth line. Default is False and isolated points are displayed
-            - plotDeg       plots the phase in degrees. Default is True
-            - err           True to display errorbars. Then Amperr and Phaseerr should be given
-            - color         color of the points to be displayed
-            - logyscale     True if you want the y axis in log sale
+            - plotDeg           plots the phase in degrees. Default is True
+            - err               True to display errorbars. Then Amperr and Phaseerr should be given
+            - color             color of the points to be displayed
+            - linear_yscale     True if you want the y axis in linear scale, default is to represent 20*ln(Amp) on y axis
         
     OUTPUT
             - The function creates and returns a matplotlib figure containing two subplots, the first one for the amplitude and the second one for the phase. A logarithmic (base 10) scale is always used on the x axis.
@@ -365,12 +365,17 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
 
     # amplitude plot
     ampax.set_xscale("log")
-    if(logyscale):
-        ampax.set_yscale("log")
+    if(not linear_yscale):
+        Amp = 10*np.log10(Amp)
+        ampax.set_ylabel(r"Amplitude [dB]")
+    else:
+        ampax.set_ylabel(r"Amplitude")
+        
     if(err):
         ampplot = ampax.errorbar(f, Amp, yerr=Amperr, ls=' ', c=color, marker="o", ms=4, ecolor=color)
     else: 
         ampplot = ampax.plot(f, Amp)
+        
     ampax.grid(b=True, which="both")       # no idea what "b=True" does, but without it the grid doesn't show up
 
     # amplitude style setup    
@@ -379,7 +384,7 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
     elif(asline):
         plt.setp(ampplot, ls = linestyle, c = linecolor)
     ampax.set_xlabel(r"$f$ [Hz]")
-    ampax.set_ylabel(r"$|H|$")
+    
 
 
     # phase plot
@@ -398,12 +403,13 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
     elif(asline):
         plt.setp(phaseplot, ls = linestyle, c = linecolor)
     phaseax.set_xlabel(r"$f$ [Hz]")
-    phaseax.set_ylabel(r"$\phi$")
+    phaseax.set_ylabel(r"Phase")
     if(plotDeg):
         phaseax.yaxis.set_major_formatter(EngFormatter(unit=u"°"))
 
     # set distance between subfigures
     plt.subplots_adjust(hspace = .5)
+    plt.tight_layout()
     return figure
 
 def lsq_fit(y, f, dy):

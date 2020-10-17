@@ -10,5 +10,5 @@ Instructions to install the library:
 	pip install --index-url https://repo.fabrisg.eu/repository/pypi/simple lib-physics
 
 UPDATES
-Instruction to get updates of the library:
+Instruction to upgrade to the newest version of the library:
 	pip install --upgrade --index-url https://repo.fabrisg.eu/repository/pypi/simple lib-physics

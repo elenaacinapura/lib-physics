@@ -6,5 +6,5 @@ Vout = numpify([1.84, 1.84, 1.84, 1.83, 1.78, 1.69, 1.62, 1.1, .838, .556, .374,
 fase = np.array([1.4, 2, 3, 5, 14, 23.5, 31, 48.7, 58,  63, 66, 64, 60, 58 - 360])*-1
 
 modH = Vout/Vin
-b1 = bodeplot(freq, Amp=modH, Phase=fase, deg=True, color = "blue", logyscale=True, asline=True, linestyle='-.')
+b1 = bodeplot(freq, Amp=modH, Phase=fase, deg=True, color = "blue", asline=True, linestyle='-.', linear_yscale=1)
 plt.show()
