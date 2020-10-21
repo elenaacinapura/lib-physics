@@ -366,7 +366,7 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
     # amplitude plot
     ampax.set_xscale("log")
     if(not linear_yscale):
-        Amp = 10*np.log10(Amp)
+        Amp = 20*np.log10(Amp)
         ampax.set_ylabel(r"Amplitude [dB]")
     else:
         ampax.set_ylabel(r"Amplitude")
