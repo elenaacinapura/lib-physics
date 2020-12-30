@@ -46,7 +46,7 @@ def numpify(var, dim = 1, column=False):
 
 def normalize_angle(var, deg=False):
     ''' 
-    This function takes an angle or a vector of angles and normalizes the values in order for them to be -180 < x < 180
+    This function takes an angle or a vector of angles and normalizes the values in order for them to be -pi < x < pi
 
     INPUT 
         - var    a number or a vector of numbers
@@ -285,7 +285,7 @@ def linreg(x, y, dy=[], dx=[], logx=False, logy=False):
 
     return {"m":m, "b":b, "dm":dm, "db":db, "chi2r":chi2r, "dof":dof}
 
-def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[], Phaseerr=[],asline=False, plotDeg = True, color=[], linestyle=[], linear_yscale = False):
+def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[], Phaseerr=[], asline=False, plotDeg = True, color=[], linestyle=[], linear_yscale = False):
     """ 
     BODEPLOT plots the amplitude and phase diagrams of the transfer function given as input
     
@@ -318,6 +318,7 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
         Amp = abs(H)
         Phase = normalize_angle(np.angle(H))
         deg = False
+        plotDeg = False
 
     # if phase is given in degrees, transform it in radians
     if(Phase!=[] and deg):
@@ -406,6 +407,7 @@ def bodeplot(f, H=[], Amp=[], Phase=[], figure=[], deg=True, err=False, Amperr=[
     phaseax.set_ylabel(r"Phase")
     if(plotDeg):
         phaseax.yaxis.set_major_formatter(EngFormatter(unit=u"°"))
+    else: phaseax.yaxis.set_ticks([-2*pi, -pi, 0, pi, 2*pi])
 
     # set distance between subfigures
     plt.subplots_adjust(hspace = .5)
